@@ -1738,7 +1738,7 @@ importers:
         specifier: ^2.4.5
         version: link:../../packages/core
       '@voltagent/server-core':
-        specifier: ^2.1.7
+        specifier: ^2.1.8
         version: link:../../packages/server-core
       '@voltagent/server-hono':
         specifier: ^2.0.7
