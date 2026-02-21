@@ -112,6 +112,7 @@ jobs:
   postgres-integration:
     runs-on: ubuntu-latest
     name: PostgreSQL Integration Tests
+    timeout-minutes: 30
     concurrency:
       group: ${{ github.ref }}-postgres-integration
       cancel-in-progress: true
@@ -172,3 +173,89 @@ jobs:
           npm run test:integration:ci
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/voltagent_test
+
+  quality-council:
+    name: Quality Council
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: always()
+    needs:
+      - lint
+      - build
+    steps:
+      - name: Evaluate quality checks
+        run: |
+          echo "lint=${{ needs.lint.result }}"
+          echo "build=${{ needs.build.result }}"
+
+          test "${{ needs.lint.result }}" = "success"
+          test "${{ needs.build.result }}" = "success"
+
+  regression-council:
+    name: Regression Council
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: always()
+    needs:
+      - test-packages
+      - postgres-integration
+    steps:
+      - name: Evaluate regression checks
+        run: |
+          echo "test-packages=${{ needs.test-packages.result }}"
+          echo "postgres-integration=${{ needs.postgres-integration.result }}"
+
+          test "${{ needs.test-packages.result }}" = "success"
+          test "${{ needs.postgres-integration.result }}" = "success"
+
+  security-council:
+    name: Security Council
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Security scan for changed files
+        run: sh ./scripts/factory-council-security.sh
+
+  factory-memory-governance:
+    name: Factory Memory Governance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce incident memory updates
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: sh ./scripts/factory-memory-governance.sh
+
+  factory-gates:
+    name: Factory Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: always()
+    needs:
+      - commit-lint
+      - quality-council
+      - regression-council
+      - security-council
+      - factory-memory-governance
+    steps:
+      - name: Evaluate required jobs
+        run: |
+          echo "commit-lint=${{ needs.commit-lint.result }}"
+          echo "quality-council=${{ needs.quality-council.result }}"
+          echo "regression-council=${{ needs.regression-council.result }}"
+          echo "security-council=${{ needs.security-council.result }}"
+          echo "factory-memory-governance=${{ needs.factory-memory-governance.result }}"
+
+          test "${{ needs.commit-lint.result }}" = "success"
+          test "${{ needs.quality-council.result }}" = "success"
+          test "${{ needs.regression-council.result }}" = "success"
+          test "${{ needs.security-council.result }}" = "success"
+          test "${{ needs.factory-memory-governance.result }}" = "success"

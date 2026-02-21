@@ -32,6 +32,15 @@ pnpm lint:fix        # Auto-fix linting issues
 4. **Follow the monorepo structure** - changes may impact multiple packages
 5. **Test your changes** - ensure all tests pass before committing
 
+## Autonomous Factory Additions (Applicable Now)
+
+1. **Keep a strict project constitution** - keep this file concise and constraint-first; add new rules only after real review findings or incidents.
+2. **Use deterministic completion gates** - treat work as complete only when changed scope passes lint, build, and relevant tests.
+3. **Require a completion council before merge** - run focused checks for implementation quality, test/regression risks, and security/privacy risks.
+4. **Maintain persistent engineering memory** - capture root causes, fixes, and guardrails for incidents so future agents reuse proven decisions.
+5. **Orchestrate work in waves** - run small parallel batches, then synchronize and re-plan; avoid unbounded autonomous loops.
+6. **Set hard run limits** - define max time, cost/token budget, and retry count for autonomous runs, and stop with a clear handoff when limits are reached.
+
 ## Gotchas
 
 - **JSON.stringify** SHOULD NEVER BE USED, used the `safeStringify` function instead, imported from `@voltagent/internal`
