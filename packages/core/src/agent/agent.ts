@@ -967,6 +967,7 @@ export class Agent {
 
     // Wrap entire execution in root span for trace context
     const rootSpan = oc.traceContext.getRootSpan();
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: generation path intentionally coordinates tracing, middleware, guardrails, model fallback, and persistence in one operation scope.
     return await oc.traceContext.withSpan(rootSpan, async () => {
       const guardrailSet = this.resolveGuardrailSets(options);
       const middlewareSet = this.resolveMiddlewareSets(options);
@@ -4992,6 +4993,7 @@ export class Agent {
     return true;
   }
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: fallback orchestration keeps retry and model-switch control flow co-located to preserve deterministic hook and telemetry ordering.
   private async executeWithModelFallback<T>({
     oc,
     operation,

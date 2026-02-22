@@ -87,6 +87,7 @@ export function andAgent<
     name: agent.name || agent.id,
     purpose: agent.purpose ?? null,
     agent,
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: step execution intentionally handles both workflow-context and context-free paths to keep usage accounting consistent.
     execute: async (context) => {
       const { state } = context;
       const { schema, ...restConfig } = config;

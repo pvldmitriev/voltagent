@@ -27,8 +27,27 @@ lint_targets="$(
   printf '%s\n' "$changed_files" | rg '\.(cjs|cts|js|json|jsx|md|mdx|mjs|mts|ts|tsx|yaml|yml)$' || true
 )"
 if [ -n "$lint_targets" ]; then
-  echo "[quality-council] lint changed files"
-  printf '%s\n' "$lint_targets" | xargs pnpm exec biome check --diagnostic-level=error --no-errors-on-unmatched --
+  lint_count=0
+  set --
+  while IFS= read -r lint_file; do
+    if [ -z "$lint_file" ]; then
+      continue
+    fi
+    if [ ! -f "$lint_file" ]; then
+      continue
+    fi
+    set -- "$@" "$lint_file"
+    lint_count=$((lint_count + 1))
+  done <<EOF
+$lint_targets
+EOF
+
+  if [ "$lint_count" -gt 0 ]; then
+    echo "[quality-council] lint changed files"
+    pnpm exec biome check --error-on-warnings --no-errors-on-unmatched -- "$@"
+  else
+    echo "[quality-council] no existing lint targets"
+  fi
 fi
 
 package_names="$(

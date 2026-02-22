@@ -791,6 +791,7 @@ export class NodeFilesystemBackend implements FilesystemBackendProtocol {
     });
   }
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: fallback search intentionally combines containment, glob filtering, regex safety, and result capping to preserve safety guarantees in one pass.
   private async fallbackSearch(
     pattern: string,
     baseFull: string,
