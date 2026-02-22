@@ -40,3 +40,8 @@ for pkg in $package_names; do
   fi
   lerna run test --scope "$scope" --include-dependencies
 done
+
+if printf '%s\n' "$changed_files" | rg -q '^(packages/create-voltagent-app/|packages/core/|scripts/factory-|package\.json|pnpm-lock\.yaml)'; then
+  echo "[regression-council] factory smoke"
+  pnpm factory:smoke
+fi

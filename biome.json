@@ -52,6 +52,7 @@
       "coverage",
       "*.template",
       ".nx",
+      ".factory-smoke-dist",
       "packages/docs-mcp/examples",
       "**/*.module.css",
       "**/.docusaurus/**",
@@ -61,7 +62,8 @@
       ".wrangler",
       "packages/server-hono/src/vendor",
       "examples/with-nuxt",
-      "examples/with-assistant-ui"
+      "examples/with-assistant-ui",
+      "commontime-copy/**"
     ]
   },
   "overrides": [

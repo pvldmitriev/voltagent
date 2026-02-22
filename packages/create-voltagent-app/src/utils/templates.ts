@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import {
   AI_PROVIDER_CONFIG,
@@ -6,9 +7,15 @@ import {
   type TemplateFile,
 } from "../types";
 
-// Determine the correct base path for templates.
-// In the built version, templates are at ../templates relative to dist/
-const TEMPLATES_DIR = path.resolve(__dirname, "..", "templates");
+const TEMPLATE_DIR_CANDIDATES = [
+  path.resolve(__dirname, "..", "templates"),
+  path.resolve(__dirname, "..", "..", "templates"),
+  path.resolve(process.cwd(), "packages", "create-voltagent-app", "templates"),
+];
+
+const TEMPLATES_DIR =
+  TEMPLATE_DIR_CANDIDATES.find((candidate) => fs.existsSync(candidate)) ??
+  TEMPLATE_DIR_CANDIDATES[0];
 
 export const getBaseTemplates = (): TemplateFile[] => {
   return [
